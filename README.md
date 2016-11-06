@@ -1,4 +1,4 @@
-# Testing Functor Instances With QuickCheck and 
+# Testing Functor Instances With QuickCheck 
 
 In this example I'm using the QuickCheck library to test some Functor properties.
 It is interesting to notice the usage of Test.QuickCheck.Function to automatically
