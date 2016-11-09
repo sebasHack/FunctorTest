@@ -75,11 +75,23 @@ instance (Arbitrary a, Ord a) => Arbitrary (Tree a) where
           a <- arbitrary
           genTree (k - 1) (insert a tree)
 
+-- Rose Instance of Arbitrary
+
+instance Arbitrary a => Arbitrary (Rose a) where
+  arbitrary = sized arbitrarySizedTree
+    where
+      arbitrarySizedTree :: Arbitrary a => Int -> Gen (Rose a)
+      arbitrarySizedTree n = do
+        t <- arbitrary
+        k <- choose (0, n `div` 2)
+        ts <- vectorOf n (arbitrarySizedTree (k `div` 4))
+        return (Rose t ts)
 
 
+-- Tests
       
-main :: IO ()
-main = hspec $ do
+tests :: IO ()
+tests = hspec $ do 
   describe "Identity Functor" $ do
     it "satisfies identity property" $ do
       property (functorIdentity :: Identity Int -> Bool)
@@ -110,5 +122,21 @@ main = hspec $ do
       property (functorIdentity :: Tree String -> Bool)
     it "satisfies composition property" $ do
       property (functorCompose :: Fun String Int -> Fun Int Int -> Tree String -> Bool)
-  
+
+roseTests :: IO ()
+roseTests = do     
+  putStrLn ""
+  putStrLn "Rose Functor"
+  putStrLn ""
+  putStrLn "Identity Property"
+  quickCheckWith stdArgs { maxSuccess = 40 } (functorIdentity :: Rose String -> Bool)
+  putStrLn ""
+  putStrLn "Composition Property"
+  quickCheckWith stdArgs { maxSuccess = 30 } (functorCompose :: Fun String Int -> Fun Int Int -> Rose String -> Bool)
+
+
+main :: IO ()
+main = do
+  tests
+  roseTests
       

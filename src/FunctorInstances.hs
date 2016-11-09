@@ -59,3 +59,26 @@ insert x node@(Node a l r)
   | x < a = Node a (insert x l) r
   | otherwise = Node a l (insert x r)
  
+
+-- Rose Tree Functor
+
+data Rose a = Rose a [Rose a] deriving (Eq, Show)
+
+edges :: Rose a -> Int
+edges (Rose _ []) = 0
+edges (Rose _ roses) = length roses + (sum $ fmap (\t -> edges t) roses)
+
+nodes :: Rose a -> Int
+nodes r = 1 + edges r
+
+
+instance Functor Rose where
+  fmap f (Rose x []) = Rose (f x) []
+  fmap f (Rose x roses) = Rose (f x) (fmap (fmap f) roses)
+
+
+
+
+
+
+
